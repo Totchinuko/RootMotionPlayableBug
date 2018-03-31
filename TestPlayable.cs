@@ -5,15 +5,19 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 
 public class TestPlayable : MonoBehaviour
-{	
-	public AnimationClip run;
+{
+    public DirectorUpdateMode mode;
+    public AnimationClip run;
 	private PlayableGraph graph;
+    private AnimationPlayableOutput playableOutput;
+    
 
-	public void Awake()
+    public void Awake()
 	{
 		graph = PlayableGraph.Create();
+        graph.SetTimeUpdateMode(mode);
 		
-		var playableOutput = AnimationPlayableOutput.Create(graph, "EthanWithPlayable", GetComponent<Animator>());
+		playableOutput = AnimationPlayableOutput.Create(graph, "EthanWithPlayable", GetComponent<Animator>());
 
 		var runClip = AnimationClipPlayable.Create(graph, run);
 		
@@ -21,4 +25,10 @@ public class TestPlayable : MonoBehaviour
 
 		graph.Play();
 	}
+
+    private void FixedUpdate()
+    {
+        if(mode == DirectorUpdateMode.Manual)
+            graph.Evaluate(Time.fixedDeltaTime);
+    }
 }
